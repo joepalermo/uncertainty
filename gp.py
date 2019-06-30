@@ -5,24 +5,23 @@ import matplotlib.pyplot as plt
 
 def generate_input_data(train_size, test_size, plot=False):
     inpt = np.random.uniform(-5,5,size=train_size+test_size)
-    # out = inpt**5 - 3*inpt**4 - 5*inpt**3 + 6*inpt**2 + 1 + np.random.randn(train_size+test_size)
-    out = inpt
+    out = inpt**5 - 3*inpt**4 - 5*inpt**3 + 6*inpt**2 + 1 + np.random.randn(train_size+test_size)
     # extract train
-    y_inpt, y_out = inpt[0:train_size],out[0:train_size]
+    train_inpt, train_out = inpt[0:train_size],out[0:train_size]
     # extract test
-    x_inpt, x_out = inpt[train_size:], out[train_size:]
+    test_inpt, test_out = inpt[train_size:], out[train_size:]
     if plot:
-        plt.scatter(y_inpt, y_out, c='blue') # plot train
-        plt.scatter(x_inpt, x_out, c='red')  # plot test
+        plt.scatter(train_inpt, train_out, c='blue') # plot train
+        plt.scatter(test_inpt, test_out, c='red')  # plot test
         plt.show()
-    return y_inpt, y_out, x_inpt, x_out
+    return train_inpt, train_out, test_inpt, test_out
 
 # plotting utilities ---------------------------------------------------------------------------------------------------
 
-def plot(y_inpt, y_out, x_inpt, x_out, preds):
-    plt.scatter(y_inpt, y_out, c='blue')  # plot train
-    plt.scatter(x_inpt, x_out, c='red')  # plot test
-    plt.scatter(x_inpt, preds, c='green') # plot predictions
+def plot(train_inpt, train_out, test_inpt, test_out, preds):
+    plt.scatter(train_inpt, train_out, c='blue')  # plot train
+    plt.scatter(test_inpt, test_out, c='red')  # plot test
+    plt.scatter(test_inpt, preds, c='green') # plot predictions
     plt.show()
 
 def plot_kernel(kernel):
@@ -54,31 +53,31 @@ def get_covariance_matrix(inp1, inp2, verbose=False):
         print(covariance_matrix)
     return covariance_matrix
 
-def compute_conditioned_mean(x_inpt, y_inpt, y_out):
-    cov_xy = get_covariance_matrix(x_inpt, y_inpt)
-    cov_yy = get_covariance_matrix(y_inpt, y_inpt)
-    return np.matmul(np.matmul(cov_xy,
-                               np.linalg.inv(cov_yy)),
-                     np.reshape(y_out, (len(y_out),1))).flatten()
+def compute_conditioned_mean(test_inpt, train_inpt, train_out):
+    test_train_cov = get_covariance_matrix(test_inpt, train_inpt)
+    train_cov = get_covariance_matrix(train_inpt, train_inpt)
+    return np.matmul(np.matmul(test_train_cov,
+                               np.linalg.inv(train_cov)),
+                     np.reshape(train_out, (len(train_out),1))).flatten()
 
-def compute_conditioned_covariance(x_inpt, y_inpt):
-    cov_xx = get_covariance_matrix(x_inpt, x_inpt)
-    cov_xy = get_covariance_matrix(x_inpt, y_inpt)
-    cov_yx = get_covariance_matrix(y_inpt, x_inpt)
-    cov_yy = get_covariance_matrix(y_inpt, y_inpt)
-    return cov_xx - np.matmul(np.matmul(cov_xy, np.linalg.inv(cov_yy)), cov_yx)
+def compute_conditioned_covariance(test_inpt, train_inpt):
+    test_cov = get_covariance_matrix(test_inpt, test_inpt)
+    test_train_cov = get_covariance_matrix(test_inpt, train_inpt)
+    train_test_cov = get_covariance_matrix(train_inpt, test_inpt)
+    train_cov = get_covariance_matrix(train_inpt, train_inpt)
+    return test_cov - np.matmul(np.matmul(test_train_cov, np.linalg.inv(train_cov)), train_test_cov)
 
-def sample_predictions(x_inpt, n_samples):
-    mean = compute_conditioned_mean(x_inpt, y_inpt, y_out)
-    cov = compute_conditioned_covariance(x_inpt, y_inpt)
+def sample_predictions(test_inpt, n_samples):
+    mean = compute_conditioned_mean(test_inpt, train_inpt, train_out)
+    cov = compute_conditioned_covariance(test_inpt, train_inpt)
     preds = np.random.multivariate_normal(mean, cov, size=n_samples).flatten()
-    x_inpts = np.concatenate([x_inpt]*n_samples)
+    test_inpts = np.concatenate([test_inpt]*n_samples)
     preds = np.concatenate([preds])
-    return x_inpts, preds
+    return test_inpts, preds
 
-def predict(x_inpt):
-    mean = compute_conditioned_mean(x_inpt, y_inpt, y_out)
-    cov = compute_conditioned_covariance(x_inpt, y_inpt)
+def predict(test_inpt):
+    mean = compute_conditioned_mean(test_inpt, train_inpt, train_out)
+    cov = compute_conditioned_covariance(test_inpt, train_inpt)
     return mean, np.diagonal(cov)
 
 # run code -------------------------------------------------------------------------------------------------------------
@@ -87,13 +86,13 @@ def predict(x_inpt):
 kernel = rbf_kernel
 
 # generate dataset
-y_inpt, y_out, x_inpt, x_out = generate_input_data(20,5, plot=False)
+train_inpt, train_out, test_inpt, test_out = generate_input_data(15,3, plot=False)
 
 # sample predictions
 n_samples = 1
-x_inpts, preds = sample_predictions(x_inpt, n_samples)
-x_outs = np.concatenate([x_out]*n_samples)
-plot(y_inpt, y_out, x_inpts, x_outs, preds)
+test_inpts, preds = sample_predictions(test_inpt, n_samples)
+test_outs = np.concatenate([test_out]*n_samples)
+plot(train_inpt, train_out, test_inpts, test_outs, preds)
 
 # marginalize to obtain the mean and variance for each test example
-mean, cov = predict(x_inpt)
+mean, cov = predict(test_inpt)
