@@ -41,13 +41,11 @@ def plot_kernel(kernel):
 
 # kernel utilities -----------------------------------------------------------------------------------------------------
 
-# length=0.8, variance=1
 def rbf_kernel(t1,t2, hparams):
     length = hparams['length']
     variance = hparams['variance']
     return variance * np.exp(-np.power(np.linalg.norm(t1-t2),2)/(2*(length**2)))
 
-# sigma_b=0.8, sigma=0.3, offset=0
 def linear_kernel(t1,t2, hparams):
     sigma_b = hparams['sigma_b']
     sigma = hparams['sigma']
@@ -93,38 +91,44 @@ def sample_predictions(test_inpt, n_samples, hparams):
 def predict(test_inpt, hparams):
     mean = compute_conditioned_mean(test_inpt, train_inpt, train_out, hparams)
     cov = compute_conditioned_covariance(test_inpt, train_inpt, hparams)
-    return mean, np.diagonal(cov)
+    return mean, np.sqrt(np.diagonal(cov))
 
-def tune_hparams(length_range, variance_range, n_trials):
-    # prepare grid search
-    grid_size = int(n_trials**(1/2))
-    mat1, mat2 = np.meshgrid(np.linspace(length_range[0], length_range[1], grid_size),
-                            np.linspace(variance_range[0], variance_range[1], grid_size))
-    pairs = list(zip(mat1.flatten(), mat2.flatten()))
+def tune_hparams(param_distributions, n_trials):
+    trial_hparams_list = list()
     scores = list()
-    for pair in pairs:
-        hparams = {'kernel': rbf_kernel,'length': pair[0], 'variance': pair[1]}
+    for _ in range(n_trials):
+        hparams = {'kernel': param_distributions['kernel']}
+        for param, uniform_range in param_distributions.items():
+            if param != 'kernel':
+                uniform_min = uniform_range[0]
+                uniform_max = uniform_range[1]
+                hparams[param] = np.random.uniform(uniform_min, uniform_max)
         mean, _ = predict(test_inpt, hparams)
+        trial_hparams_list.append(hparams)
         scores.append(mse(test_out, mean))
-    print(scores)
-    print(pairs)
     min_score, min_score_index = np.min(scores), np.argmin(scores)
-    min_params = pairs[min_score_index]
+    min_params = trial_hparams_list[min_score_index]
     return min_params, min_score
 
 # run code -------------------------------------------------------------------------------------------------------------
 
 # generate dataset
-train_inpt, train_out, test_inpt, test_out = generate_input_data(25,5, plot=False)
+train_inpt, train_out, test_inpt, test_out = generate_input_data(25,10, plot=False)
 
-min_params, min_score = tune_hparams((0.01,3), (0.01,3), n_trials=100)
-print(min_params, min_score)
-
-# # marginalize to obtain the mean and variance for each test example
+# marginalize to obtain the mean and variance for each test example
 # hparams = {'kernel': rbf_kernel, 'length': 1.04, 'variance': 0.34}
-# mean, variance = predict(test_inpt, hparams)
-# std_pos = mean + 2*variance
-# std_neg = mean - 2*variance
-#
-# # plot
-# plot(train_inpt, train_out, test_inpt, test_out, mean, std_pos, std_neg)
+hparams = {'kernel': linear_kernel, 'sigma_b': 0.25300875748201357, 'sigma': 0.2347854586833913, 'offset': 0.31870927427831974}
+mean, std_dev = predict(test_inpt, hparams)
+std_dev_pos = mean + 2*std_dev
+std_dev_neg = mean - 2*std_dev
+
+# plot
+plot(train_inpt, train_out, test_inpt, test_out, mean, std_dev_pos, std_dev_neg)
+
+
+# # perform random search on hyperparameters
+# param_distributions = {'kernel': linear_kernel,
+#                        'sigma_b': (0.1, 3),
+#                        'sigma': (0.1, 3),
+#                        'offset': (0.1, 3)}
+# min_params, min_score = tune_hparams(param_distributions, n_trials=100)
