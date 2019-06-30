@@ -1,6 +1,6 @@
-# bayesian-machine-learning
+# uncertainty
 
-Implementations of Bayesian machine learning algorithms.
+Implementations of machine learning algorithms that enable modelling uncertainty.
 
 blg.py: Bayesian linear regression
 
