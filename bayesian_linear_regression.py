@@ -7,9 +7,9 @@ from BayesianLinearRegressor import BayesianLinearRegressor
 
 # generate data
 domain = (-1,1)
-size = 500
+size = 200
 n_features = 1
-noise_scale = 0.1
+noise_scale = 0.5
 x, y = generate_linear_data(domain, noise_scale, size)
 # print(x.shape, y.shape)
 
@@ -32,7 +32,7 @@ X_test = np.concatenate([test_bias_inputs, X_test])
 # print(X_train.shape, X_test.shape)
 
 # training
-blr = BayesianLinearRegressor(n_features, 1)
+blr = BayesianLinearRegressor(n_features, noise_scale**2)
 blr.train_(X_train, y_train)
 
 # inference
