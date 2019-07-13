@@ -6,10 +6,10 @@ from sklearn.metrics import mean_squared_error as mse
 
 def f(x):
     size = len(x)
-    return x + np.random.randn(size)
+    return np.sin(x)
 
 def generate_input_data(train_size, test_size, plot=False):
-    inpt = np.linspace(-10,10,num=train_size+test_size)
+    inpt = np.linspace(0,10,num=train_size+test_size)
     out = f(inpt)
     # extract train
     train_inpt, train_out = inpt[0:train_size],out[0:train_size]
@@ -51,6 +51,17 @@ def linear_kernel(t1,t2, hparams):
     sigma = hparams['sigma']
     offset = hparams['offset']
     return (sigma_b**2) + (sigma**2) * (t1-offset) * (t2-offset)
+
+def periodic_kernel(t1,t2, hparams):
+    sigma = hparams['sigma']
+    length = hparams['length']
+    periodicity = hparams['periodicity']
+    return sigma**2 * np.exp((-2*(np.sin(np.pi * np.linalg.norm(t1-t2) / periodicity))**2)/length**2)
+
+def sklearn_periodic_kernel(t1,t2,hparams):
+    length_scale = hparams['length_scale']
+    periodicity = hparams['periodicity']
+    return np.exp(-2*(np.sin(np.pi / periodicity * np.linalg.norm(t1-t2)) / length_scale) ** 2)
 
 # core Gaussian process functions --------------------------------------------------------------------------------------
 
@@ -117,7 +128,8 @@ train_inpt, train_out, test_inpt, test_out = generate_input_data(25,10, plot=Fal
 
 # marginalize to obtain the mean and variance for each test example
 # hparams = {'kernel': rbf_kernel, 'length': 1.04, 'variance': 0.34}
-hparams = {'kernel': linear_kernel, 'sigma_b': 0.25300875748201357, 'sigma': 0.2347854586833913, 'offset': 0.31870927427831974}
+# hparams = {'kernel': linear_kernel, 'sigma_b': 0.25300875748201357, 'sigma': 0.2347854586833913, 'offset': 0.31870927427831974}
+hparams = {'kernel': sklearn_periodic_kernel, 'length_scale': 1, 'periodicity': 1}
 mean, std_dev = predict(test_inpt, hparams)
 std_dev_pos = mean + 2*std_dev
 std_dev_neg = mean - 2*std_dev
