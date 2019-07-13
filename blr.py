@@ -1,7 +1,10 @@
+from functools import reduce
 import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-whitegrid')
+
+matmul_list = lambda mats: reduce(np.matmul, mats)
 
 def generate_linear_data(size, noise_scale=0.1):
     x = np.random.uniform(-0.1,0.1,size=size)
@@ -24,15 +27,18 @@ class BLG:
         self.covariance_scale = covariance_scale
         self.prior_covariance_mat = covariance_scale * np.eye(n_features)
 
+    # conditioning (compute the posterior distribution of the weights)
     def train(self, X,y):
         self.X = X
         self.y = y
         self.A = np.matmul(X, X.T) + np.linalg.inv(self.prior_covariance_mat)
         self.A_inv = np.linalg.inv(self.A)
+        self.w = matmul_list([self.A_inv, self.X, self.y])
 
+    # marginalization (marginalize over the weights to obtain predictive distributions)
     def predict(self, x_star):
-        mean_preds = np.matmul(np.matmul(x_star.T, self.A_inv), np.matmul(self.X, self.y))
-        covariance_preds = np.matmul(np.matmul(x_star.T, self.A_inv),x_star)
+        mean_preds = np.matmul(x_star.T, self.w)
+        covariance_preds = matmul_list([x_star.T, self.A_inv, x_star])
         # extract the diagonal entries of the diagonal predicted covariance matrix
         variance_preds = np.diag(covariance_preds)
         return mean_preds.flatten(), variance_preds
