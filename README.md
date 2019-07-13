@@ -1,7 +1,6 @@
 # uncertainty
 
-Implementations of machine learning algorithms that enable modelling uncertainty.
+Implementations of machine learning algorithms that enable modelling uncertainty:
 
-blr.py: Bayesian linear regression
-
-gp.py: Gaussian process regression
+Bayesian linear regression
+Gaussian process regression
