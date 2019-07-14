@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-whitegrid')
 from utils import generate_linear_data, plot_regression
-from BayesianLinearRegressor import BayesianLinearRegressor
+from bayesian_linear_regression.BayesianLinearRegressor import BayesianLinearRegressor
 
 # generate data
 domain = (-0.1,0.1)
