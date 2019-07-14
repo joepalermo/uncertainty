@@ -10,10 +10,9 @@ class BayesianLinearRegressor:
     equal to the number of training examples.
     '''
 
-    def __init__(self, n_features, noise_scale):
+    def __init__(self, n_features):
         self.n_features = n_features + 1 # add one to account for the bias term
-        self.noise_scale = noise_scale
-        self.prior = noise_scale * np.eye(self.n_features)
+        self.prior = np.eye(self.n_features)
 
     def train(self, X,y):
         '''Train bayesian linear regression. This effectively performs conditioning,
@@ -27,6 +26,7 @@ class BayesianLinearRegressor:
         '''
         self.X = X
         self.y = y
+
         self.A = np.matmul(X, X.T) + np.linalg.inv(self.prior)
         self.A_inv = np.linalg.inv(self.A)
         self.w = matmul_list([self.A_inv, self.X, self.y])
@@ -59,7 +59,7 @@ class BayesianLinearRegressor:
         self.K = matmul_list([X.T, self.prior, X])
         self.B = matmul_list([self.prior,
                               X,
-                              np.linalg.inv(self.K + self.noise_scale * np.eye(len(self.K)))
+                              np.linalg.inv(self.K + np.eye(len(self.K)))
                               ])
         self.w = matmul_list([self.B, y])
         self.C = matmul_list([self.B, self.X.T, self.prior])
