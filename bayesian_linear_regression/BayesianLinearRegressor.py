@@ -10,10 +10,11 @@ class BayesianLinearRegressor:
     size equal to the number of training examples.
     '''
 
-    def __init__(self, n_features, invert_feature_mat=True):
+    def __init__(self, n_features, noise_scale, invert_feature_mat=True):
         self.n_features = n_features + 1  # add one to account for the bias term
         self.prior = np.eye(self.n_features)
         self.invert_feature_mat = invert_feature_mat
+        self.noise_scale = noise_scale
 
     def train(self, X, y):
         '''Train bayesian linear regression. This effectively performs conditioning, i.e. computing the

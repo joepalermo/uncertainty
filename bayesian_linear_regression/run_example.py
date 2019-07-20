@@ -30,7 +30,7 @@ X_train = np.concatenate([train_bias_inputs, X_train])
 X_test = np.concatenate([test_bias_inputs, X_test])
 
 # training
-blr = BayesianLinearRegressor(n_features)
+blr = BayesianLinearRegressor(n_features, noise_scale)
 blr.train(X_train, y_train)
 
 # inference
