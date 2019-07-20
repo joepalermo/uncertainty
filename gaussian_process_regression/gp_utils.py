@@ -1,8 +1,17 @@
 import numpy as np
-from utils import matmul_list
+from utils import matmul_list, plot_line
 
-def squared_exponential_kernel(x1,x2):
-    return np.exp(-0.5*np.linalg.norm(x1-x2)**2)
+def squared_exponential_kernel(x1,x2,l=1):
+    return np.exp(-0.5*(np.linalg.norm(x1-x2)/l)**2)
+
+def sample_function(x_min, x_max, n_points, covariance_function=squared_exponential_kernel):
+    xs = np.linspace(x_min, x_max, num=n_points)
+    mat_1, mat_2 = np.meshgrid(xs, xs)
+    pairs = [(x2,x1) for x1,x2 in zip(np.ravel(mat_1), np.ravel(mat_2))]
+    covariances = [covariance_function(x1,x2) for x1, x2 in pairs]
+    covariance_mat = np.reshape(covariances, (n_points, n_points))
+    ys = np.random.multivariate_normal(np.zeros(n_points), covariance_mat)
+    plot_line(xs, ys)
 
 def gaussian_process_inference(X_test, X_train, y_train, kernel):
     n_train_examples = len(X_train.T)

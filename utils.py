@@ -15,6 +15,11 @@ def generate_sinosoidal_data(domain, noise_scale, size):
     y = np.sin(x) + np.random.normal(0, noise_scale, size)
     return x,y
 
+def plot_line(xs, ys):
+    plt.scatter(xs, ys)
+    plt.plot(xs, ys)
+    plt.show()
+
 def plot_regression(train, test, mean_preds, positive_2_sigma_preds, negative_2_sigma_preds, show_train=False):
     # extract training and test data
     x_train, y_train = train
