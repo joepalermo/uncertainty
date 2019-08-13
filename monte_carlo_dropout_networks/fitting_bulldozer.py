@@ -9,7 +9,6 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
 import pandas as pd
 import numpy as np
 import json
-from matplotlib import pyplot as plt
 
 # constants
 model_filepath = 'monte_carlo_dropout_networks/models/model.h5'
@@ -49,15 +48,6 @@ test_inputs[non_categorical_cols] /= non_categorical_train_std
 test_inputs = test_inputs[column_order]
 x_test = test_inputs.values
 y_test = test_df['target'].values
-
-print("target range")
-print(f"train: {y_train.min(), y_train.mean(), y_train.max()}")
-print(f"test: {y_test.min(), y_test.mean(), y_test.max()}")
-
-# plot target distribution
-# plt.hist(y_train)
-# plt.hist(y_test)
-# plt.show()
 
 # define parameters
 n_epochs = 100
