@@ -40,6 +40,6 @@ def plot_regression(train, test, mean_preds, positive_2_sigma_preds, negative_2_
     plt.plot(x_test, negative_2_sigma_preds)
     plt.show()
 
-def sample_without_replacement(n_samples, df):
+def sample_without_replacement(df, n_samples):
     sampled_indices = np.random.choice(df.index, replace=False, size=n_samples)
     return df.loc[sampled_indices], df.drop(sampled_indices, axis=0)

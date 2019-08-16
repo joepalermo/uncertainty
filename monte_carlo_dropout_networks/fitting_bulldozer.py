@@ -90,7 +90,7 @@ else:
                                 validation_data=(x_validation, y_validation),
                                 callbacks=[lr_annealer, early_stopper],
                                 verbose=True)
-    model.save(model_filepath)
+    # model.save(model_filepath)
 
 # get model predictions
 model_preds = model.predict(x_test).flatten()
