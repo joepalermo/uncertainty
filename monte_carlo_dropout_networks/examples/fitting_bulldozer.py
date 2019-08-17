@@ -19,7 +19,7 @@ with open('data/bulldozer/categorical_sizes.json') as f:
     categorical_sizes = json.loads(categorical_sizes_str)
 
 # prepare training inputs and targets
-train_df = pd.read_csv('data/bulldozer/processed_train.csv')
+train_df = pd.read_csv('data/bulldozer/train.csv')
 train_inputs = train_df.drop('target', axis=1)
 all_cols_set = set(train_inputs.columns)
 categorical_cols_set = set(list(categorical_sizes.keys()))
@@ -39,7 +39,7 @@ y_train = train_df['target'].values
 x_train, x_validation, y_train, y_validation = train_test_split(x_train, y_train, test_size=0.1)
 
 # load test data
-test_df = pd.read_csv('data/bulldozer/processed_test.csv')
+test_df = pd.read_csv('data/bulldozer/test.csv')
 test_inputs = test_df.drop('target', axis=1)
 # normalize non-categorical columns
 test_inputs[non_categorical_cols] -= non_categorical_train_mean

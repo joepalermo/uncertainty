@@ -27,7 +27,6 @@ def run_experiments(train_df, test_df, selection_function, train_model, evaluate
             experiment_metrics.append(metric)
             print(experiment_metrics)
             all_experiments.append(experiment_metrics)
-
     # plot results
     for experiment_metrics in all_experiments:
         plt.hist(experiment_metrics)

@@ -9,7 +9,7 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
 
 class MCDNN:
 
-    def __init__(self, input_size, categorical_sizes, hyperparameters):
+    def __init__(self, input_size, hyperparameters, categorical_sizes):
         self.categorical_sizes = categorical_sizes
         self.hyperparameters = hyperparameters
         inputs = keras.Input(shape=(input_size,))
