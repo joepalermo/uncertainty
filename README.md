@@ -7,4 +7,3 @@ The following algorithms are implemented:
 
 * Bayesian linear regression
 * Gaussian process regression
-* Monte Carlo dropout networks
