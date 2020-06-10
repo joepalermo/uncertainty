@@ -25,7 +25,6 @@ class BayesianLinearRegressor:
         if self.invert_feature_mat:
             self.X = X
             self.y = y
-
             self.A = np.matmul(X, X.T) + np.linalg.inv(self.prior)
             self.A_inv = np.linalg.inv(self.A)
             self.w = matmul_list([self.A_inv, self.X, self.y])
