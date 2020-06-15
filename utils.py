@@ -26,7 +26,7 @@ def generate_uni_dim_linear_data(num_examples, domain, noise_scale, domain_type=
         x = np.concatenate([x1, x2])
     else:
         x = np.random.uniform(domain[0], domain[1], size=num_examples)
-        eps = np.random.normal(0, noise_scale, len(x))
+    eps = np.random.normal(0, noise_scale, len(x))
     y = 2*x + 1 + eps
     return x, y
 

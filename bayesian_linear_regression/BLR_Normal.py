@@ -1,7 +1,7 @@
 import numpy as np
 from utils import matmul_list
 
-class BayesianLinearRegressor:
+class BLR_Normal:
     '''
     Bayesian Linear Regressor. Two variants of training are available that make different tradeoffs.
     :param n_features: The number of features in the data (minus the bias term which is added automatically)

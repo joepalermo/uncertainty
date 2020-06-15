@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 plt.style.use('seaborn-whitegrid')
 from utils import generate_linear_data, plot_regression
 from sklearn.metrics import mean_squared_error
-from bayesian_linear_regression.BayesianLinearRegressor import BayesianLinearRegressor
+from bayesian_linear_regression.BLR_Normal import BLR_Normal
+# from bayesian_linear_regression.BLR_Normal_Inverse_Gamma import BLR_Normal_Inverse_Gamma
 
 # generate data
 size = (500, 1)
@@ -34,7 +35,8 @@ X_test = np.concatenate([test_bias_inputs, X_test])
 
 # training
 n_features = size[1] if type(size) == tuple else 1
-blr = BayesianLinearRegressor(n_features, noise_scale, invert_feature_mat=False)
+blr = BLR_Normal(n_features, noise_scale, invert_feature_mat=True)
+# blr = BLR_Normal_Inverse_Gamma(n_features)
 blr.train(X_train, y_train)
 
 # inference
