@@ -41,23 +41,36 @@ class BLR_Normal_Inverse_Gamma:
         self.a = a_post
         self.b = b_post
 
-    def predict(self, X, n_samples=1000):
+    def predict(self, X):
+        '''Performs inference using a trained bayesian linear regression model. This effectively performs
+        marginalization over the posterior distribution of the weights to obtain the predictive
+        distribution for each input).
+        :param X_test: inputs'''
+        # (1,k) (k,n) = (1,n)
+        mean_preds = np.matmul(self.mu.T, X)
+        # (1) * (n,n) + (n,k) * (k,k) * (k,n) = (n,n)
+        covariance_preds = self.b / self.a * (np.eye(len(X.T)) + matmul_list([X.T, self.cov, X]))
+        # extract the diagonal entries of the diagonal predicted covariance matrix
+        variance_preds = np.diag(covariance_preds)
+        return mean_preds.flatten(), variance_preds
+
+    def predict_from_samples(self, X, n_samples=1000):
         '''Performs inference using a trained bayesian linear regression model.
         We characterize the predictive distribution for each input by sampling the posterior many times, and computing
         statistics about the predictive distribution.
         :param X: inputs
-        :param n_samples: the number of samples to use in the approximation
-        '''
-
+        :param n_samples: the number of samples to use in the approximation'''
         sampled_preds = list()
+        sampled_sigma2s = list()
         for _ in range(n_samples):
             # sample sigma2, and beta conditional on sigma2
             sampled_sigma2 = self.b * invgamma.rvs(self.a)
+            sampled_sigma2s.append(sampled_sigma2)
             sampled_beta = np.random.multivariate_normal(self.mu.flatten(), sampled_sigma2 * self.cov, size=len(X.T))
             sampled_pred = np.sum(sampled_beta * X.T, axis=1)
             sampled_preds.append(np.expand_dims(sampled_pred, 1))
         sampled_preds = np.concatenate(sampled_preds, axis=1)
         mean_preds = np.mean(sampled_preds, axis=1)
-        variance_preds = np.var(sampled_preds, axis=1)
+        variance_preds = np.mean(sampled_sigma2s) + np.var(sampled_preds, axis=1)
         # extract the diagonal entries of the diagonal predicted covariance matrix
         return mean_preds, variance_preds
