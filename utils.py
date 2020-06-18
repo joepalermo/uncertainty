@@ -21,8 +21,8 @@ def generate_uni_dim_linear_data(num_examples, domain, noise_scale, domain_type=
         x = np.clip(np.random.lognormal(0, 3, size=num_examples), domain[0], domain[1])
         x = x[x < domain[1]]
     elif domain_type == 'bimodal':
-        x1 = np.random.beta(1, 5, size=num_examples // 2)
-        x2 = np.random.beta(5, 1, size=num_examples // 2)
+        x1 = np.random.beta(1, 19, size=num_examples // 2)
+        x2 = np.random.beta(19, 1, size=num_examples // 2)
         x = np.concatenate([x1, x2])
     else:
         x = np.random.uniform(domain[0], domain[1], size=num_examples)
@@ -41,7 +41,7 @@ def generate_multi_dim_linear_data(size, domain, noise_scale):
     return x, y
 
 
-def generate_sinosoidal_data(domain, noise_scale, size):
+def generate_sinosoidal_data(size, domain, noise_scale):
     x = np.random.uniform(domain[0], domain[1], size=size)
     y = np.sin(x) + np.random.normal(0, noise_scale, size)
     return x, y
