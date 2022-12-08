@@ -4,7 +4,7 @@ atomicwrites==1.3.0
 attrs==19.1.0
 boto3==1.9.209
 botocore==1.12.209
-certifi==2019.6.16
+certifi==2022.12.7
 cycler==0.10.0
 docutils==0.15.2
 gast==0.2.2
